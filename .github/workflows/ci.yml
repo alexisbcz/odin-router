@@ -1,4 +1,4 @@
-# CI for alexisbcz Odin libraries. Copy as-is; nothing here is library specific.
+# CI for odin-router, based on the alexisbcz Odin library template.
 name: CI
 
 on:
@@ -54,6 +54,9 @@ jobs:
             odin build "$dir" -vet -strict-style -disallow-do -out:"${RUNNER_TEMP}/example"
             echo "::endgroup::"
           done
+
+      - name: Run basic example
+        run: odin run examples/basic -vet -strict-style -disallow-do -out:"${RUNNER_TEMP}/basic"
 
   docs:
     name: Vale
