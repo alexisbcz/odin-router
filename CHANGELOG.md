@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-29
+
+### Fixed
+
+- `handle` on a group now rejects a pattern that doesn't start with `/` with `Missing_Leading_Slash`. Before, the router glued the pattern onto the group prefix, so `"users"` on `/api` became `/apiusers` and `"x"` on `/users/:id` renamed the parameter to `idx`.
+- `:*` and `**` are now rejected with `Invalid_Param_Name`. Only a bare `*` wildcard may use the name `*`.
+
 ## [0.1.0] - 2026-10-29
 
 ### Added
@@ -19,5 +26,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - `method_parse`, `method_string`, `methods_write` and `methods_format` helpers.
 - Examples: `basic` routes fake requests in memory, and `server` runs a small HTTP/1.1 server on `core:net`.
 
-[Unreleased]: https://github.com/alexisbcz/odin-router/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/alexisbcz/odin-router/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/alexisbcz/odin-router/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/alexisbcz/odin-router/releases/tag/v0.1.0

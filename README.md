@@ -117,6 +117,8 @@ setup :: proc(r: ^router.Router) -> router.Error {
 }
 ```
 
+A route pattern on a group starts with `/`, like any other pattern, and the group puts its prefix in front. On a group, the empty pattern `""` routes the prefix itself, so `router.handle(admin, .Get, "", h)` matches `/admin`.
+
 Middleware runs from the outside in: the router's own middleware first, then each enclosing group in order. The router resolves the chain when a request arrives, so middleware that you add after a route still wraps it. The router's own middleware also wraps the 404, 405 and 400 handlers.
 
 ## Not found, method not allowed and OPTIONS
