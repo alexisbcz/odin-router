@@ -324,7 +324,8 @@ handle registers `handler` for `method` requests whose path matches `pattern`.
 Inputs:
 - target: the router, or a group whose prefix goes in front of `pattern`.
 - method: the request method.
-- pattern: a path starting with '/'. A segment that starts with `:` captures
+- pattern: a path starting with '/'. On a group with a prefix it may also be
+  "", which routes the prefix itself. A segment that starts with `:` captures
   one non-empty path segment, and a final segment that starts with `*`
   captures the rest of the path, which may be empty. A bare `*` captures under
   the name "*". Elsewhere `:` and `*` are literal.
@@ -343,6 +344,11 @@ handle :: proc(target: Target, method: Method, pattern: string, handler: Handler
 	}
 	if handler == nil {
 		return .Nil_Handler
+	}
+	// Check the pattern itself: a group prefix in front would otherwise hide a
+	// missing slash and glue "users" onto "/api" as "/apiusers".
+	if len(pattern) > 0 && pattern[0] != '/' {
+		return .Missing_Leading_Slash
 	}
 	r := g.router
 
