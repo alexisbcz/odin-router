@@ -84,15 +84,15 @@ pattern_parse :: proc(pattern: string, p: ^Pattern) -> Route_Error {
 			if j < len(pattern) {
 				return .Wildcard_Not_Last
 			}
+		}
+		if kind == .Wildcard && name == "" {
+			// A bare `*` captures under the name "*". No other token may use
+			// that name, so `:*` and `**` are rejected below.
+			name = pattern[i:j]
+		} else {
 			if name == "" {
-				// A bare `*` captures under the name "*".
-				name = pattern[i:j]
+				return .Invalid_Param_Name
 			}
-		}
-		if name == "" {
-			return .Invalid_Param_Name
-		}
-		if name != "*" {
 			for k in 0 ..< len(name) {
 				if !is_name_byte(name[k]) {
 					return .Invalid_Param_Name
