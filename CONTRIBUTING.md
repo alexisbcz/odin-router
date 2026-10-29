@@ -27,10 +27,10 @@ All three must pass with zero errors.
 Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Write an imperative subject of 72 characters or fewer, a blank line, then a body of `-` bullet points that explain what changed and why:
 
 ```text
-fix: reject negative counts in repeat
+fix: reject empty parameter names
 
-- repeat used to allocate a huge buffer when count was negative
-- return Repeat_Error.Negative_Count before touching the allocator
+- "/users/:" used to register a parameter with no name
+- return Route_Error.Invalid_Param_Name before touching the tree
 ```
 
 ## Changelog
