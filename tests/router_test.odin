@@ -1112,3 +1112,43 @@ test_router_destroy_frees_large_tree :: proc(t: ^testing.T) {
 	expect_route(&f, .Get, "/r12/9/x5", "/r12/:id/x5")
 	testing.expect_value(t, len(f.r.routes), 200)
 }
+
+// ---- Regressions ----
+
+@(test)
+test_group_handle_rejects_pattern_without_leading_slash :: proc(t: ^testing.T) {
+	f: Fixture
+	fixture_init(&f, t)
+	defer fixture_destroy(&f)
+	api, _ := router.group(&f.r, "/api")
+	user, _ := router.group(&f.r, "/users/:id")
+	// Without the check these silently became "/apiusers", "/api*" and "/users/:idx".
+	testing.expect_value(t, router.handle(api, .Get, "users", h_a), route_err(.Missing_Leading_Slash))
+	testing.expect_value(t, router.handle(api, .Get, "*", h_a), route_err(.Missing_Leading_Slash))
+	testing.expect_value(t, router.handle(user, .Get, "x", h_a), route_err(.Missing_Leading_Slash))
+	testing.expect_value(t, len(f.r.routes), 0)
+	expect_lookup_error(&f, .Get, "/apiusers", .Not_Found)
+}
+
+@(test)
+test_group_handle_empty_pattern_routes_the_prefix :: proc(t: ^testing.T) {
+	f: Fixture
+	fixture_init(&f, t)
+	defer fixture_destroy(&f)
+	api, _ := router.group(&f.r, "/api")
+	testing.expect_value(t, router.handle(api, .Get, "", h_a), nil)
+	expect_route(&f, .Get, "/api", "/api")
+	expect_lookup_error(&f, .Get, "/api/", .Not_Found)
+}
+
+@(test)
+test_handle_rejects_star_as_param_name :: proc(t: ^testing.T) {
+	f: Fixture
+	fixture_init(&f, t)
+	defer fixture_destroy(&f)
+	// Only a bare `*` wildcard may use the name "*".
+	for p in ([]string{"/p/:*", "/w/**", "/w/*a*"}) {
+		testing.expectf(t, router.handle(&f.r, .Get, p, h_a) == route_err(.Invalid_Param_Name), "%q accepted", p)
+	}
+	testing.expect_value(t, len(f.r.routes), 0)
+}
